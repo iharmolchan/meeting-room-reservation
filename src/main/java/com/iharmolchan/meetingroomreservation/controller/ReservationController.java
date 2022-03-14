@@ -1,15 +1,15 @@
 package com.iharmolchan.meetingroomreservation.controller;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.iharmolchan.meetingroomreservation.model.MeetingRoom;
+import com.iharmolchan.meetingroomreservation.model.Reservation;
 import com.iharmolchan.meetingroomreservation.service.ReservationService;
+import com.iharmolchan.meetingroomreservation.views.DefaultView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,6 +19,38 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReservationController {
     private final ReservationService reservationService;
+
+    @GetMapping
+    public List<Reservation> getAll(@RequestParam(required = false) Long meetingRoomId) {
+        return meetingRoomId == null ? reservationService.getAll() : reservationService.getAllByRoomId(meetingRoomId);
+    }
+
+    @GetMapping("/{id}")
+    public Reservation getById(@PathVariable Long id) {
+        return reservationService.getById(id);
+    }
+
+
+    @PostMapping
+    public Reservation createReservation(
+            @RequestParam Long meetingRoomId,
+            @JsonView(DefaultView.CREATE.class) @RequestBody Reservation reservation
+    ) {
+        return reservationService.save(reservation, meetingRoomId);
+    }
+
+    @PutMapping
+    public Reservation updateReservation(
+            @RequestParam Long meetingRoomId,
+            @JsonView(DefaultView.UPDATE.class) @RequestBody Reservation reservation
+    ) {
+        return reservationService.save(reservation, meetingRoomId);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteById(@PathVariable Long id) {
+        reservationService.deleteById(id);
+    }
 
     @Operation(
             summary = "Get free meeting rooms sorted by efficiency of allocation. Returns rooms only with multimedia " +
@@ -36,4 +68,6 @@ public class ReservationController {
     ) {
         return reservationService.getFreeRooms(meetingStartDateTime, attendeesNumber, multimediaRequired, buildingId);
     }
+
+
 }
