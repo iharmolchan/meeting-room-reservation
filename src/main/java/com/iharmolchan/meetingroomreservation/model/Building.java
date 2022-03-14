@@ -9,6 +9,7 @@ import lombok.ToString;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "buildings")
@@ -18,5 +19,6 @@ import javax.persistence.Table;
 @ToString
 public class Building extends BaseEntity {
     @JsonView({DefaultView.CREATE.class, DefaultView.UPDATE.class})
+    @NotBlank
     private String address;
 }

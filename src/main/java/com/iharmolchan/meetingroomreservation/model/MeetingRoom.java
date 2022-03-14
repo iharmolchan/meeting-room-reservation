@@ -14,6 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 
@@ -24,8 +25,11 @@ import java.util.List;
 @Getter
 @Setter
 public class MeetingRoom extends BaseEntity {
+
+    @Min(value = 0, message = "Room capacity can not be less than 0")
     @JsonView({DefaultView.CREATE.class, DefaultView.UPDATE.class})
     private int capacity;
+
     @JsonView({DefaultView.CREATE.class, DefaultView.UPDATE.class})
     private boolean multimediaCapability;
 
@@ -35,5 +39,6 @@ public class MeetingRoom extends BaseEntity {
     private Floor floor;
 
     @OneToMany
+    @JoinColumn(name = "meeting_room_id")
     private List<Reservation> reservations;
 }
