@@ -35,7 +35,7 @@ public class FloorController {
     }
 
     @PutMapping
-    public Floor updateBuilding(
+    public Floor updateFloor(
             @PathVariable Long buildingId,
             @JsonView(DefaultView.UPDATE.class) @RequestBody Floor floor
     ) {

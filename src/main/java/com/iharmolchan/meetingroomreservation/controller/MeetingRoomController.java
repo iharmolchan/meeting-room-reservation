@@ -28,7 +28,7 @@ public class MeetingRoomController {
 
 
     @PostMapping
-    public MeetingRoom createFloor(
+    public MeetingRoom createMeetingRoom(
             @RequestParam Long floorId,
             @JsonView(DefaultView.CREATE.class) @RequestBody MeetingRoom meetingRoom
     ) {
@@ -36,7 +36,7 @@ public class MeetingRoomController {
     }
 
     @PutMapping
-    public MeetingRoom updateBuilding(
+    public MeetingRoom updateMeetingRoom(
             @RequestParam Long floorId,
             @JsonView(DefaultView.UPDATE.class) @RequestBody MeetingRoom meetingRoom
     ) {

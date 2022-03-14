@@ -39,7 +39,7 @@ public class DefaultMeetingRoomService implements MeetingRoomService {
     @Override
     public MeetingRoom getById(Long id) {
         return meetingRoomRepository.findById(id)
-                .orElseThrow(() -> new DbEntityNotFoundException("Can't find meeting room floor with id: " + id));
+                .orElseThrow(() -> new DbEntityNotFoundException("Can't find meeting room with id: " + id));
     }
 
     @Override
