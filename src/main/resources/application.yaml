@@ -18,3 +18,9 @@ spring:
       hibernate:
         generate_statistics: true
         format_sql: true
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger
