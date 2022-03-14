@@ -2,7 +2,7 @@ package com.iharmolchan.meetingroomreservation.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.iharmolchan.meetingroomreservation.model.Building;
-import com.iharmolchan.meetingroomreservation.service.BuildingService;
+import com.iharmolchan.meetingroomreservation.service.impl.DefaultBuildingService;
 import com.iharmolchan.meetingroomreservation.views.DefaultView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/buildings")
 public class BuildingController {
-    private final BuildingService buildingService;
+    private final DefaultBuildingService buildingService;
 
     @GetMapping
     public List<Building> getAll() {
@@ -25,15 +25,20 @@ public class BuildingController {
         return buildingService.getById(id);
     }
 
-    @JsonView(DefaultView.CREATE.class)
+
     @PostMapping
-    public Building createBuilding(@RequestBody Building building) {
+    public Building createBuilding(@JsonView(DefaultView.CREATE.class) @RequestBody Building building) {
         return buildingService.save(building);
     }
 
-    @JsonView(DefaultView.UPDATE.class)
     @PutMapping
-    public Building updateBuilding(@RequestBody Building building) {
+    public Building updateBuilding(@JsonView(DefaultView.UPDATE.class) @RequestBody Building building) {
         return buildingService.save(building);
     }
+
+    @DeleteMapping("/{id}")
+    public void deleteById(@PathVariable Long id) {
+        buildingService.deleteById(id);
+    }
+
 }
