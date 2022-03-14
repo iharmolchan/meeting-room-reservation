@@ -1,4 +1,17 @@
 package com.iharmolchan.meetingroomreservation.service;
 
-public class MeetingRoomService {
+import com.iharmolchan.meetingroomreservation.model.MeetingRoom;
+
+import java.util.List;
+
+public interface MeetingRoomService {
+    MeetingRoom save(MeetingRoom meetingRoom, Long floorId);
+
+    List<MeetingRoom> getAll();
+
+    List<MeetingRoom> getAllByFloorId(Long floorId);
+
+    MeetingRoom getById(Long id);
+
+    void deleteById(Long id);
 }

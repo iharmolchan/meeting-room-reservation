@@ -19,4 +19,6 @@ public interface MeetingRoomRepository extends JpaRepository<MeetingRoom, Long> 
             "ORDER BY mr.capacity"
     )
     List<MeetingRoom> getFreeRooms(Integer capacity, Boolean multimediaCapability, LocalDateTime meetingStartDateTime, Long buildingId);
+
+    List<MeetingRoom> findAllByFloorId(Long floorId);
 }
