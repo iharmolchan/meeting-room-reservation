@@ -5,8 +5,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.*;
-import java.util.List;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "buildings")
@@ -16,8 +16,4 @@ import java.util.List;
 @ToString
 public class Building extends BaseEntity {
     private String address;
-
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "building_id")
-    private List<Floor> floors;
 }
