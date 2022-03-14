@@ -9,9 +9,10 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "building_floors")
+@Table(name = "building_floors", uniqueConstraints = { @UniqueConstraint(columnNames = { "number", "building_id" }) })
 @NoArgsConstructor
 @Getter
 @Setter
