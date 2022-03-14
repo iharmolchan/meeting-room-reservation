@@ -2,7 +2,7 @@ package com.iharmolchan.meetingroomreservation.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.iharmolchan.meetingroomreservation.model.Floor;
-import com.iharmolchan.meetingroomreservation.service.impl.DefaultFloorService;
+import com.iharmolchan.meetingroomreservation.service.FloorService;
 import com.iharmolchan.meetingroomreservation.views.DefaultView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/buildings/{buildingId}/floors")
 public class FloorController {
-    private final DefaultFloorService floorService;
+    private final FloorService floorService;
 
     @GetMapping
     public List<Floor> getAllByBuilding(@PathVariable Long buildingId) {
