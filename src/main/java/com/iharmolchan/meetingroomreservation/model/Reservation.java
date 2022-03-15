@@ -27,11 +27,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
+@ToString(exclude = {"meetingRoom"})
 @ReservationDatesAreValid
 @Entity
 @Table(name = "reservations")
-public class Reservation extends BaseEntity{
+public class Reservation extends BaseEntity {
 
     @JsonView({DefaultView.CREATE.class, DefaultView.UPDATE.class})
     @NotBlank
