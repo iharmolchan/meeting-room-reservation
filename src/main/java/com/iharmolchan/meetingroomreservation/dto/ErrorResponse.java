@@ -14,7 +14,7 @@ public class ErrorResponse {
     private String message;
     private String extendedDescription;
 
-    private ErrorResponse() {
+    public ErrorResponse() {
         timestamp = LocalDateTime.now();
     }
 
