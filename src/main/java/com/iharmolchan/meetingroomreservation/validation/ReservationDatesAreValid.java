@@ -9,11 +9,11 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = {DateIsAfterAnotherValidator.class})
-public @interface DateIsAfterAnother {
-    String message() default "Tested date in not after another one.";
+@Constraint(validatedBy = {ReservationDatesValidator.class})
+public @interface ReservationDatesAreValid {
+    String message() default "Reservation finish date should be after start date.";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
-    String baseDateField();
-    String dateAfterField();
 }

@@ -1,7 +1,9 @@
 package com.iharmolchan.meetingroomreservation.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.iharmolchan.meetingroomreservation.validation.DateIsAfterAnother;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.iharmolchan.meetingroomreservation.validation.ReservationDatesAreValid;
+import com.iharmolchan.meetingroomreservation.views.DefaultView;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,12 +26,18 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@DateIsAfterAnother(baseDateField = "reservationStart", dateAfterField = "reservationFinish")
+@ReservationDatesAreValid
 public class Reservation extends BaseEntity{
+
+    @JsonView({DefaultView.CREATE.class, DefaultView.UPDATE.class})
     @NotBlank
     private String meetingDescription;
+
+    @JsonView({DefaultView.CREATE.class, DefaultView.UPDATE.class})
     @FutureOrPresent(message = "It's not possible to reserve a meeting room in the past")
     private LocalDateTime reservationStart;
+
+    @JsonView({DefaultView.CREATE.class, DefaultView.UPDATE.class})
     @Future(message = "It's not possible to reserve a meeting room in the past")
     private LocalDateTime reservationFinish;
 
