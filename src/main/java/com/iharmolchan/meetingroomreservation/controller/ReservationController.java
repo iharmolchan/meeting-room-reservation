@@ -31,6 +31,7 @@ public class ReservationController {
     }
 
 
+    @Operation(summary = "Creates reservation as well as cleaning reservation for created one.")
     @PostMapping
     public Reservation createReservation(
             @RequestParam Long meetingRoomId,
@@ -39,6 +40,7 @@ public class ReservationController {
         return reservationService.save(reservation, meetingRoomId);
     }
 
+    @Operation(summary = "Updates reservation as well as cleaning reservation for created one.")
     @PutMapping
     public Reservation updateReservation(
             @RequestParam Long meetingRoomId,

@@ -13,8 +13,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -38,17 +40,19 @@ public class DefaultReservationService implements ReservationService {
     private final MeetingRoomRepository meetingRoomRepository;
     private final ReservationRepository reservationRepository;
 
+    @Transactional
     @Override
     public Reservation save(Reservation reservation, Long meetingRoomId) {
         MeetingRoom meetingRoom = getMeetingRoomById(meetingRoomId);
         reservation.setMeetingRoom(meetingRoom);
-
-        int roomCleanTime = basicRoomCleanTime + cleanTimePerRoomSeat * meetingRoom.getCapacity();
-        LocalDateTime updatedMeetingFinishTime = reservation.getReservationFinish().plusMinutes(roomCleanTime);
-        reservation.setReservationFinish(updatedMeetingFinishTime);
-
         checkReservationIsValid(reservation);
-        return reservationRepository.save(reservation);
+
+        Reservation cleaningReservation = createCleaningReservation(reservation);
+        reservation.setParentReservation(cleaningReservation);
+
+        Reservation savedReservation = reservationRepository.save(reservation);
+        reservationRepository.save(cleaningReservation);
+        return savedReservation;
     }
 
     @Override
@@ -80,6 +84,21 @@ public class DefaultReservationService implements ReservationService {
         return meetingRoomRepository.getFreeRooms(attendeesNumber, multimediaRequired, meetingDateTime, buildingId);
     }
 
+    private Reservation createCleaningReservation(Reservation reservation) {
+        int roomCleanTime = basicRoomCleanTime + cleanTimePerRoomSeat * reservation.getMeetingRoom().getCapacity();
+        LocalDateTime cleaningStart = reservation.getReservationFinish();
+        LocalDateTime cleaningFinish = cleaningStart.plusMinutes(roomCleanTime);
+
+        Reservation cleaningReservation = Reservation.builder()
+                .reservationStart(cleaningStart)
+                .reservationFinish(cleaningFinish)
+                .meetingRoom(reservation.getMeetingRoom())
+                .meetingDescription("Cleaning room after meeting: " + reservation.getMeetingDescription())
+                .build();
+        checkReservationIsValid(cleaningReservation);
+        return cleaningReservation;
+    }
+
     private void checkReservationIsValid(Reservation reservation) {
         LocalTime reservationStart = reservation.getReservationStart().toLocalTime();
         LocalTime reservationFinish = reservation.getReservationFinish().toLocalTime();
@@ -89,19 +108,22 @@ public class DefaultReservationService implements ReservationService {
 
         if (!reservationDatesValid) {
             throw new ValidationException(String.format(
-                    "Reservation start and finish time should be in between opening (%s) and closing (%s) hours.",
-                    meetingRoomOpening, meetingRoomClosing
+                    "Reservation %s is invalid. Start and finish time should be in between opening (%s) and closing (%s) hours.",
+                    reservation, meetingRoomOpening, meetingRoomClosing
             ));
         }
 
-        List<Reservation> overlappedReservation = reservationRepository.getOverlappedReservation(
+        List<Reservation> overlappedReservations = reservationRepository.getOverlappedReservation(
                 reservation.getMeetingRoom().getId(),
                 reservation.getReservationStart(),
                 reservation.getReservationFinish()
         );
 
-        if(!overlappedReservation.isEmpty()) {
-            throw new ValidationException("Reservation overlaps some other ones: " + overlappedReservation);
+        if (!overlappedReservations.isEmpty()) {
+            throw new ValidationException(String.format(
+                    "Reservation %s is invalid. Reservation overlaps some other ones: %s",
+                    reservation, overlappedReservations
+            ));
         }
     }
 
