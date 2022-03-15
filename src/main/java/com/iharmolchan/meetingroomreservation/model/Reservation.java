@@ -1,5 +1,6 @@
 package com.iharmolchan.meetingroomreservation.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.iharmolchan.meetingroomreservation.validation.DateIsAfterAnother;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,6 +33,7 @@ public class Reservation extends BaseEntity{
     @Future(message = "It's not possible to reserve a meeting room in the past")
     private LocalDateTime reservationFinish;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "meeting_room_id")
     @OnDelete(action = OnDeleteAction.CASCADE)

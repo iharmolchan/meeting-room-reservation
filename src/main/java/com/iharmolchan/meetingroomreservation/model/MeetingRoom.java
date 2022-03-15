@@ -1,6 +1,7 @@
 package com.iharmolchan.meetingroomreservation.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.iharmolchan.meetingroomreservation.views.DefaultView;
 import lombok.Getter;
@@ -18,7 +19,7 @@ import javax.validation.constraints.Min;
 import java.util.List;
 
 
-@JsonIgnoreProperties(value = {"floor", "reservations"})
+@JsonIgnoreProperties(value = {"floor"})
 @Entity
 @Table(name = "meeting_rooms")
 @NoArgsConstructor
@@ -38,6 +39,7 @@ public class MeetingRoom extends BaseEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Floor floor;
 
+    @JsonManagedReference
     @OneToMany
     @JoinColumn(name = "meeting_room_id")
     private List<Reservation> reservations;
