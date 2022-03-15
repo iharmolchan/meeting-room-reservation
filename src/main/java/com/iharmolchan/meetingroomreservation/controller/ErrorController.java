@@ -33,7 +33,7 @@ public class ErrorController {
             errorResponse.setStatus(HttpStatus.BAD_GATEWAY);
         }
         errorResponse.setMessage(ex.getMessage());
-        errorResponse.setExtendedDescription(ex.getCause() != null ? ex.getCause().getMessage() : "");
+        errorResponse.setExtendedDescription(cause != null ? cause.getMessage() : "");
         return buildResponseEntity(errorResponse);
     }
 

@@ -7,6 +7,7 @@ import com.iharmolchan.meetingroomreservation.repository.MeetingRoomRepository;
 import com.iharmolchan.meetingroomreservation.repository.ReservationRepository;
 import com.iharmolchan.meetingroomreservation.service.ReservationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -16,13 +17,23 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DefaultReservationService implements ReservationService {
 
+    @Value("${meetingRooms.cleanTime.basic}")
+    private Integer basicRoomCleanTime;
+    @Value("${meetingRooms.cleanTime.perSeat}")
+    private Integer cleanTimePerRoomSeat;
+
     private final MeetingRoomRepository meetingRoomRepository;
     private final ReservationRepository reservationRepository;
 
     @Override
     public Reservation save(Reservation reservation, Long meetingRoomId) {
-        MeetingRoom meetingRoom = meetingRoomRepository.getById(meetingRoomId);
+        MeetingRoom meetingRoom = getMeetingRoomById(meetingRoomId);
         reservation.setMeetingRoom(meetingRoom);
+
+        int roomCleanTime = basicRoomCleanTime + cleanTimePerRoomSeat * meetingRoom.getCapacity();
+        LocalDateTime updatedMeetingFinishTime = reservation.getReservationFinish().plusMinutes(roomCleanTime);
+        reservation.setReservationFinish(updatedMeetingFinishTime);
+
         return reservationRepository.save(reservation);
     }
 
@@ -53,5 +64,10 @@ public class DefaultReservationService implements ReservationService {
             Boolean multimediaRequired, Long buildingId
     ) {
         return meetingRoomRepository.getFreeRooms(attendeesNumber, multimediaRequired, meetingDateTime, buildingId);
+    }
+
+    private MeetingRoom getMeetingRoomById(Long id) {
+        return meetingRoomRepository.findById(id)
+                .orElseThrow(() -> new DbEntityNotFoundException("Can't find meeting room with id: " + id));
     }
 }
