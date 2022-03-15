@@ -1,6 +1,6 @@
 package com.iharmolchan.meetingroomreservation.controller;
 
-import com.iharmolchan.meetingroomreservation.DbEntityNotFoundException;
+import com.iharmolchan.meetingroomreservation.exception.DbEntityNotFoundException;
 import com.iharmolchan.meetingroomreservation.dto.ErrorResponse;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;

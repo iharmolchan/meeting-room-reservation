@@ -1,10 +1,8 @@
 package com.iharmolchan.meetingroomreservation.service.impl;
 
-import com.iharmolchan.meetingroomreservation.DbEntityNotFoundException;
-import com.iharmolchan.meetingroomreservation.model.Building;
+import com.iharmolchan.meetingroomreservation.exception.DbEntityNotFoundException;
 import com.iharmolchan.meetingroomreservation.model.Floor;
 import com.iharmolchan.meetingroomreservation.model.MeetingRoom;
-import com.iharmolchan.meetingroomreservation.repository.BuildingRepository;
 import com.iharmolchan.meetingroomreservation.repository.FloorRepository;
 import com.iharmolchan.meetingroomreservation.repository.MeetingRoomRepository;
 import com.iharmolchan.meetingroomreservation.service.MeetingRoomService;
