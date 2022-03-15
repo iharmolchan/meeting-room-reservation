@@ -1,6 +1,7 @@
 package com.iharmolchan.meetingroomreservation.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.iharmolchan.meetingroomreservation.validation.ReservationDatesAreValid;
 import com.iharmolchan.meetingroomreservation.views.DefaultView;
@@ -20,13 +21,15 @@ import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "reservations")
+
+@JsonIgnoreProperties(value = {"meetingRoom"})
 @NoArgsConstructor
 @Getter
 @Setter
 @ToString
 @ReservationDatesAreValid
+@Entity
+@Table(name = "reservations")
 public class Reservation extends BaseEntity{
 
     @JsonView({DefaultView.CREATE.class, DefaultView.UPDATE.class})
