@@ -11,7 +11,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = {ReservationDatesValidator.class})
 public @interface ReservationDatesAreValid {
-    String message() default "Reservation finish date should be after start date.";
+    String message() default "Reservation start and finish dates should be in the same day." +
+            " Reservation finish date should be after start date.";
 
     Class<?>[] groups() default {};
 

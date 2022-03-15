@@ -24,3 +24,12 @@ springdoc:
     path: /api-docs
   swagger-ui:
     path: /swagger
+
+
+meetingRooms:
+  workingHours:
+    start: "08:00"
+    finish: "19:00"
+  cleanTime:
+    basic: 5
+    perSeat: 1

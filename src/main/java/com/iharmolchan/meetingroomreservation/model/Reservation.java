@@ -19,6 +19,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 
@@ -38,10 +39,12 @@ public class Reservation extends BaseEntity{
 
     @JsonView({DefaultView.CREATE.class, DefaultView.UPDATE.class})
     @FutureOrPresent(message = "It's not possible to reserve a meeting room in the past")
+    @NotNull
     private LocalDateTime reservationStart;
 
     @JsonView({DefaultView.CREATE.class, DefaultView.UPDATE.class})
     @Future(message = "It's not possible to reserve a meeting room in the past")
+    @NotNull
     private LocalDateTime reservationFinish;
 
     @JsonBackReference

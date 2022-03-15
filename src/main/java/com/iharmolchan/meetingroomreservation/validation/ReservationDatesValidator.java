@@ -4,6 +4,8 @@ import com.iharmolchan.meetingroomreservation.model.Reservation;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class ReservationDatesValidator implements ConstraintValidator<ReservationDatesAreValid, Reservation> {
 
@@ -14,6 +16,9 @@ public class ReservationDatesValidator implements ConstraintValidator<Reservatio
 
     @Override
     public boolean isValid(Reservation reservation, ConstraintValidatorContext constraintValidatorContext) {
-        return reservation.getReservationFinish().isAfter(reservation.getReservationStart());
+        LocalDate reservationStartDate = reservation.getReservationStart().toLocalDate();
+        LocalDate reservationFinishDate = reservation.getReservationFinish().toLocalDate();
+        return reservationStartDate.isEqual(reservationFinishDate) &&
+                reservation.getReservationFinish().isAfter(reservation.getReservationStart());
     }
 }
