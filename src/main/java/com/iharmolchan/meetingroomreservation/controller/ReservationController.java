@@ -12,11 +12,18 @@ import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/reservation")
@@ -31,7 +38,7 @@ public class ReservationController {
     public List<ReservationTO> getAll(@RequestParam(required = false) Long meetingRoomId) {
         List<Reservation> reservations = meetingRoomId == null ? reservationService.getAll() :
                 reservationService.getAllByRoomId(meetingRoomId);
-        return reservations.stream().map(this::convertToDto).collect(Collectors.toList());
+        return reservations.stream().map(this::convertToDto).toList();
     }
 
     @JsonView(DefaultView.GET.class)

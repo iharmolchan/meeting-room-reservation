@@ -1,7 +1,6 @@
 package com.iharmolchan.meetingroomreservation.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.iharmolchan.meetingroomreservation.model.Floor;
 import com.iharmolchan.meetingroomreservation.model.MeetingRoom;
 import com.iharmolchan.meetingroomreservation.service.MeetingRoomService;
 import com.iharmolchan.meetingroomreservation.views.DefaultView;

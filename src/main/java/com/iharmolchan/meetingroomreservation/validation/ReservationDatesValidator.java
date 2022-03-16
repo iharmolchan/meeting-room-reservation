@@ -5,7 +5,6 @@ import com.iharmolchan.meetingroomreservation.model.Reservation;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public class ReservationDatesValidator implements ConstraintValidator<ReservationDatesAreValid, Reservation> {
 
