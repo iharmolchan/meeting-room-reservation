@@ -80,14 +80,6 @@ public class DefaultReservationService implements ReservationService {
         reservationRepository.deleteById(id);
     }
 
-    @Override
-    public List<MeetingRoom> getFreeRooms(
-            LocalDateTime meetingDateTime, Integer attendeesNumber,
-            Boolean multimediaRequired, Long buildingId
-    ) {
-        return meetingRoomRepository.getFreeRooms(attendeesNumber, multimediaRequired, meetingDateTime, buildingId);
-    }
-
     private Reservation prepareCleaningReservation(Reservation reservation) {
         int roomCleanTime = basicRoomCleanTime + cleanTimePerRoomSeat * reservation.getMeetingRoom().getCapacity();
         LocalDateTime cleaningStart = reservation.getReservationFinish();

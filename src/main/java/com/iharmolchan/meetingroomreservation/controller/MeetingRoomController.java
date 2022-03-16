@@ -8,8 +8,11 @@ import com.iharmolchan.meetingroomreservation.model.MeetingRoom;
 import com.iharmolchan.meetingroomreservation.service.FloorService;
 import com.iharmolchan.meetingroomreservation.service.MeetingRoomService;
 import com.iharmolchan.meetingroomreservation.views.DefaultView;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -30,6 +34,7 @@ public class MeetingRoomController {
     private final MeetingRoomService meetingRoomService;
     private final FloorService floorService;
 
+    @Operation(summary = "Returns all rooms with corresponding reservations.")
     @JsonView(DefaultView.GET.class)
     @GetMapping
     public List<MeetingRoomTO> getAll(@RequestParam(required = false) Long floorId) {
@@ -37,12 +42,29 @@ public class MeetingRoomController {
         return meetingRooms.stream().map(this::convertToDto).toList();
     }
 
+    @Operation(summary = "Returns a room with corresponding reservations.")
     @JsonView(DefaultView.GET.class)
     @GetMapping("/{id}")
     public MeetingRoomTO getById(@PathVariable Long id) {
         return convertToDto(meetingRoomService.getById(id));
     }
 
+    @Operation(
+            summary = "Get free meeting rooms sorted by efficiency of allocation. Returns rooms only with multimedia " +
+                    "if multimedia is required and rooms with  multimedia and without if multimedia is not required " +
+                    "(in that case rooms wihout multimedia are shown higher). Returns rooms with reservations."
+
+    )
+    @GetMapping("/free")
+    public List<MeetingRoom> getFreeRooms(
+            @Parameter(description = "Datetime in yyyy-MM-dd HH:mm:ss format", example = "2000-10-31 01:30:00")
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime meetingStartDateTime,
+            @RequestParam Integer attendeesNumber,
+            @RequestParam Boolean multimediaRequired,
+            @RequestParam(required = false) Long buildingId
+    ) {
+        return meetingRoomService.getFreeRooms(meetingStartDateTime, attendeesNumber, multimediaRequired, buildingId);
+    }
 
     @PostMapping
     public MeetingRoomTO createMeetingRoom(@JsonView(DefaultView.CREATE.class) @RequestBody MeetingRoomTO meetingRoomTo) {

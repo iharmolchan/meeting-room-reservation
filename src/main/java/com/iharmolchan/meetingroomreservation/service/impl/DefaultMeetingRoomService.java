@@ -7,6 +7,7 @@ import com.iharmolchan.meetingroomreservation.service.MeetingRoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -33,6 +34,15 @@ public class DefaultMeetingRoomService implements MeetingRoomService {
     public MeetingRoom getById(Long id) {
         return meetingRoomRepository.findById(id)
                 .orElseThrow(() -> new DbEntityNotFoundException("Can't find meeting room with id: " + id));
+    }
+
+
+    @Override
+    public List<MeetingRoom> getFreeRooms(
+            LocalDateTime meetingDateTime, Integer attendeesNumber,
+            Boolean multimediaRequired, Long buildingId
+    ) {
+        return meetingRoomRepository.getFreeRooms(attendeesNumber, multimediaRequired, meetingDateTime, buildingId);
     }
 
     @Override

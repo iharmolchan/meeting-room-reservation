@@ -16,9 +16,4 @@ public interface ReservationService {
     Reservation getById(Long id);
 
     void deleteById(Long id);
-
-    List<MeetingRoom> getFreeRooms(
-            LocalDateTime meetingDateTime, Integer attendeesNumber,
-            Boolean multimediaRequired, Long buildingId
-    );
 }

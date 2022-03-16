@@ -71,23 +71,6 @@ public class ReservationController {
         reservationService.deleteById(id);
     }
 
-    @Operation(
-            summary = "Get free meeting rooms sorted by efficiency of allocation. Returns rooms only with multimedia " +
-                    "if multimedia is required and rooms with  multimedia and without if multimedia is not required " +
-                    "(in that case rooms wihout multimedia are shown higher)."
-
-    )
-    @GetMapping("free-rooms")
-    public List<MeetingRoom> getFreeRooms(
-            @Parameter(description = "Datetime in yyyy-MM-dd HH:mm:ss format", example = "2000-10-31 01:30:00")
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime meetingStartDateTime,
-            @RequestParam Integer attendeesNumber,
-            @RequestParam Boolean multimediaRequired,
-            @RequestParam(required = false) Long buildingId
-    ) {
-        return reservationService.getFreeRooms(meetingStartDateTime, attendeesNumber, multimediaRequired, buildingId);
-    }
-
     private ReservationTO convertToDto(Reservation reservation) {
         return modelMapper.map(reservation, ReservationTO.class);
     }
