@@ -9,6 +9,7 @@ import com.iharmolchan.meetingroomreservation.repository.ReservationRepository;
 import com.iharmolchan.meetingroomreservation.service.ReservationService;
 import com.iharmolchan.meetingroomreservation.utils.TimeUtils;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -37,21 +38,24 @@ public class DefaultReservationService implements ReservationService {
     @DateTimeFormat(pattern = "HH:mm")
     private LocalTime meetingRoomClosing;
 
+    private final ModelMapper modelMapper;
     private final MeetingRoomRepository meetingRoomRepository;
     private final ReservationRepository reservationRepository;
 
     @Transactional
     @Override
-    public Reservation save(Reservation reservation, Long meetingRoomId) {
-        MeetingRoom meetingRoom = getMeetingRoomById(meetingRoomId);
-        reservation.setMeetingRoom(meetingRoom);
+    public Reservation save(Reservation reservation) {
         checkReservationIsValid(reservation);
 
-        Reservation cleaningReservation = createCleaningReservation(reservation);
-        reservation.setParentReservation(cleaningReservation);
-
         Reservation savedReservation = reservationRepository.save(reservation);
-        reservationRepository.save(cleaningReservation);
+
+        // if reservation is not cleaning reservation
+        if (reservation.getParentReservation() == null) {
+            Reservation cleaningReservation = prepareCleaningReservation(reservation);
+            checkReservationIsValid(cleaningReservation);
+            cleaningReservation.setParentReservation(reservation);
+            reservationRepository.save(cleaningReservation);
+        }
         return savedReservation;
     }
 
@@ -84,18 +88,16 @@ public class DefaultReservationService implements ReservationService {
         return meetingRoomRepository.getFreeRooms(attendeesNumber, multimediaRequired, meetingDateTime, buildingId);
     }
 
-    private Reservation createCleaningReservation(Reservation reservation) {
+    private Reservation prepareCleaningReservation(Reservation reservation) {
         int roomCleanTime = basicRoomCleanTime + cleanTimePerRoomSeat * reservation.getMeetingRoom().getCapacity();
         LocalDateTime cleaningStart = reservation.getReservationFinish();
         LocalDateTime cleaningFinish = cleaningStart.plusMinutes(roomCleanTime);
 
-        Reservation cleaningReservation = Reservation.builder()
-                .reservationStart(cleaningStart)
-                .reservationFinish(cleaningFinish)
-                .meetingRoom(reservation.getMeetingRoom())
-                .meetingDescription("Cleaning room after meeting: " + reservation.getMeetingDescription())
-                .build();
-        checkReservationIsValid(cleaningReservation);
+        Reservation cleaningReservation = getCleaningReservation(reservation);
+        cleaningReservation.setMeetingDescription("Cleaning room after meeting: " + reservation.getMeetingDescription());
+        cleaningReservation.setReservationStart(cleaningStart);
+        cleaningReservation.setReservationFinish(cleaningFinish);
+
         return cleaningReservation;
     }
 
@@ -113,7 +115,16 @@ public class DefaultReservationService implements ReservationService {
             ));
         }
 
-        List<Reservation> overlappedReservations = reservationRepository.getOverlappedReservation(
+        List<Long> excludedReservationIds = new ArrayList<>();
+        excludedReservationIds.add(reservation.getId());
+
+        if(reservation.getId() != null && reservation.getParentReservation() == null ) {
+            Reservation cleaningReservation = getCleaningReservation(reservation);
+            excludedReservationIds.add(cleaningReservation.getId());
+        }
+
+        List<Reservation> overlappedReservations = reservationRepository.getOverlappedReservations(
+                excludedReservationIds,
                 reservation.getMeetingRoom().getId(),
                 reservation.getReservationStart(),
                 reservation.getReservationFinish()
@@ -127,8 +138,10 @@ public class DefaultReservationService implements ReservationService {
         }
     }
 
-    private MeetingRoom getMeetingRoomById(Long id) {
-        return meetingRoomRepository.findById(id)
-                .orElseThrow(() -> new DbEntityNotFoundException("Can't find meeting room with id: " + id));
+    private Reservation getCleaningReservation(Reservation reservation) {
+        return reservationRepository.findByParentReservationId(reservation.getId())
+                .orElseGet(() -> Reservation.builder()
+                        .meetingRoom(reservation.getMeetingRoom())
+                        .build());
     }
 }

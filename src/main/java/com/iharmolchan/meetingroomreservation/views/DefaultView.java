@@ -6,4 +6,8 @@ public class DefaultView {
 
     public interface UPDATE {
     }
+
+    public interface GET {
+
+    }
 }

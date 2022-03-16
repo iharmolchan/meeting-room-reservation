@@ -1,52 +1,62 @@
 package com.iharmolchan.meetingroomreservation.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.iharmolchan.meetingroomreservation.dto.ReservationTO;
 import com.iharmolchan.meetingroomreservation.model.MeetingRoom;
 import com.iharmolchan.meetingroomreservation.model.Reservation;
+import com.iharmolchan.meetingroomreservation.service.MeetingRoomService;
 import com.iharmolchan.meetingroomreservation.service.ReservationService;
 import com.iharmolchan.meetingroomreservation.views.DefaultView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/reservation")
 @RequiredArgsConstructor
 public class ReservationController {
     private final ReservationService reservationService;
+    private final MeetingRoomService meetingRoomService;
+    private final ModelMapper modelMapper;
 
+    @JsonView(DefaultView.GET.class)
     @GetMapping
-    public List<Reservation> getAll(@RequestParam(required = false) Long meetingRoomId) {
-        return meetingRoomId == null ? reservationService.getAll() : reservationService.getAllByRoomId(meetingRoomId);
+    public List<ReservationTO> getAll(@RequestParam(required = false) Long meetingRoomId) {
+        List<Reservation> reservations = meetingRoomId == null ? reservationService.getAll() :
+                reservationService.getAllByRoomId(meetingRoomId);
+        return reservations.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
+    @JsonView(DefaultView.GET.class)
     @GetMapping("/{id}")
-    public Reservation getById(@PathVariable Long id) {
-        return reservationService.getById(id);
+    public ReservationTO getById(@PathVariable Long id) {
+        return convertToDto(reservationService.getById(id));
     }
 
 
     @Operation(summary = "Creates reservation as well as cleaning reservation for created one.")
     @PostMapping
-    public Reservation createReservation(
-            @RequestParam Long meetingRoomId,
-            @JsonView(DefaultView.CREATE.class) @RequestBody Reservation reservation
+    public ReservationTO createReservation(
+            @JsonView(DefaultView.CREATE.class) @RequestBody ReservationTO reservationTO
     ) {
-        return reservationService.save(reservation, meetingRoomId);
+        Reservation reservation = convertToEntity(reservationTO);
+        return convertToDto(reservationService.save(reservation));
     }
 
     @Operation(summary = "Updates reservation as well as cleaning reservation for created one.")
     @PutMapping
-    public Reservation updateReservation(
-            @RequestParam Long meetingRoomId,
-            @JsonView(DefaultView.UPDATE.class) @RequestBody Reservation reservation
+    public ReservationTO updateReservation(
+            @JsonView(DefaultView.UPDATE.class) @RequestBody ReservationTO reservationTO
     ) {
-        return reservationService.save(reservation, meetingRoomId);
+        Reservation reservation = convertToEntity(reservationTO);
+        return convertToDto(reservationService.save(reservation));
     }
 
     @DeleteMapping("/{id}")
@@ -62,8 +72,8 @@ public class ReservationController {
     )
     @GetMapping("free-rooms")
     public List<MeetingRoom> getFreeRooms(
-            @Parameter(description = "Datetime in yyyy-MM-dd'T'HH:mm:ss format", example = "2000-10-31T01:30:00")
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime meetingStartDateTime,
+            @Parameter(description = "Datetime in yyyy-MM-dd HH:mm:ss format", example = "2000-10-31 01:30:00")
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime meetingStartDateTime,
             @RequestParam Integer attendeesNumber,
             @RequestParam Boolean multimediaRequired,
             @RequestParam(required = false) Long buildingId
@@ -71,5 +81,19 @@ public class ReservationController {
         return reservationService.getFreeRooms(meetingStartDateTime, attendeesNumber, multimediaRequired, buildingId);
     }
 
+    private ReservationTO convertToDto(Reservation reservation) {
+        return modelMapper.map(reservation, ReservationTO.class);
+    }
+
+    private Reservation convertToEntity(ReservationTO reservationTO) {
+        Reservation reservation = modelMapper.map(reservationTO, Reservation.class);
+        MeetingRoom meetingRoom = meetingRoomService.getById(reservationTO.getMeetingRoomId());
+        reservation.setMeetingRoom(meetingRoom);
+        if (reservationTO.getParentReservationId() != null) {
+            Reservation parent = reservationService.getById(reservationTO.getParentReservationId());
+            reservation.setParentReservation(parent);
+        }
+        return reservation;
+    }
 
 }

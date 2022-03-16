@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ReservationService {
-    Reservation save(Reservation reservation, Long meetingRoomId);
+    Reservation save(Reservation reservation);
 
     List<Reservation> getAll();
 
