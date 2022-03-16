@@ -18,9 +18,7 @@ public class DefaultMeetingRoomService implements MeetingRoomService {
     private final MeetingRoomRepository meetingRoomRepository;
 
     @Override
-    public MeetingRoom save(MeetingRoom meetingRoom, Long floorId) {
-        Floor floor = floorRepository.getById(floorId);
-        meetingRoom.setFloor(floor);
+    public MeetingRoom save(MeetingRoom meetingRoom) {
         return meetingRoomRepository.save(meetingRoom);
     }
 

@@ -1,5 +1,6 @@
 package com.iharmolchan.meetingroomreservation.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.iharmolchan.meetingroomreservation.validation.ReservationDatesAreValid;
 import lombok.AllArgsConstructor;
@@ -45,6 +46,7 @@ public class Reservation extends BaseEntity {
     @NotNull
     private LocalDateTime reservationFinish;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "meeting_room_id")
     @OnDelete(action = OnDeleteAction.CASCADE)

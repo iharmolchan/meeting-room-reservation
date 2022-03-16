@@ -5,7 +5,7 @@ import com.iharmolchan.meetingroomreservation.model.MeetingRoom;
 import java.util.List;
 
 public interface MeetingRoomService {
-    MeetingRoom save(MeetingRoom meetingRoom, Long floorId);
+    MeetingRoom save(MeetingRoom meetingRoom);
 
     List<MeetingRoom> getAll();
 

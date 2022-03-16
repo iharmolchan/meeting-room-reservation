@@ -2,8 +2,6 @@ package com.iharmolchan.meetingroomreservation.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonView;
-import com.iharmolchan.meetingroomreservation.views.DefaultView;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,10 +26,7 @@ import java.util.List;
 public class MeetingRoom extends BaseEntity {
 
     @Min(value = 0, message = "Room capacity can not be less than 0")
-    @JsonView({DefaultView.CREATE.class, DefaultView.UPDATE.class})
     private int capacity;
-
-    @JsonView({DefaultView.CREATE.class, DefaultView.UPDATE.class})
     private boolean multimediaCapability;
 
     @ManyToOne
