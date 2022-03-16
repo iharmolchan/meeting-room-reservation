@@ -2,9 +2,7 @@ package com.iharmolchan.meetingroomreservation.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.iharmolchan.meetingroomreservation.dto.FloorTO;
-import com.iharmolchan.meetingroomreservation.model.Building;
 import com.iharmolchan.meetingroomreservation.model.Floor;
-import com.iharmolchan.meetingroomreservation.service.BuildingService;
 import com.iharmolchan.meetingroomreservation.service.FloorService;
 import com.iharmolchan.meetingroomreservation.views.DefaultView;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +17,6 @@ import java.util.List;
 public class FloorController {
     private final ModelMapper modelMapper;
     private final FloorService floorService;
-    private final BuildingService buildingService;
 
     @JsonView(DefaultView.GET.class)
     @GetMapping
