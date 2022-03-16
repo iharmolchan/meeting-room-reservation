@@ -25,6 +25,16 @@ springdoc:
   swagger-ui:
     path: /swagger
 
+logging:
+  level:
+    org.springframework: ERROR
+    com.iharmolchan: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"
+    file: "%d %p %c{1.} [%t] %m%n"
+  file:
+    name: logs/app.log
+
 
 meetingRooms:
   workingHours:

@@ -11,6 +11,7 @@ import com.iharmolchan.meetingroomreservation.views.DefaultView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/meeting-rooms")
@@ -38,6 +40,7 @@ public class MeetingRoomController {
     @JsonView(DefaultView.GET.class)
     @GetMapping
     public List<MeetingRoomTO> getAll(@RequestParam(required = false) Long floorId) {
+        log.info("Returning all meeting rooms. Chosen floor is: {}.", floorId);
         List<MeetingRoom> meetingRooms = floorId == null ? meetingRoomService.getAll() : meetingRoomService.getAllByFloorId(floorId);
         return meetingRooms.stream().map(this::convertToDto).toList();
     }
@@ -46,6 +49,7 @@ public class MeetingRoomController {
     @JsonView(DefaultView.GET.class)
     @GetMapping("/{id}")
     public MeetingRoomTO getById(@PathVariable Long id) {
+        log.info("Returning meeting room with id: {}.", id);
         return convertToDto(meetingRoomService.getById(id));
     }
 
@@ -63,27 +67,35 @@ public class MeetingRoomController {
             @RequestParam Boolean multimediaRequired,
             @RequestParam(required = false) Long buildingId
     ) {
+        log.info(
+                "Getting all available meeting rooms at {} in building with id {}. Attendees number: {}. Multimedia required: {}",
+                meetingStartDateTime, buildingId, attendeesNumber, multimediaRequired
+        );
         return meetingRoomService.getFreeRooms(meetingStartDateTime, attendeesNumber, multimediaRequired, buildingId);
     }
 
     @PostMapping
     public MeetingRoomTO createMeetingRoom(@JsonView(DefaultView.CREATE.class) @RequestBody MeetingRoomTO meetingRoomTo) {
+        log.info("Creating meeting room: {}", meetingRoomTo);
         MeetingRoom meetingRoom = convertToEntity(meetingRoomTo);
         return convertToDto(meetingRoomService.save(meetingRoom));
     }
 
     @PutMapping
     public MeetingRoomTO updateMeetingRoom(@JsonView(DefaultView.UPDATE.class) @RequestBody MeetingRoomTO meetingRoomTo) {
+        log.info("Updating meeting room : {}", meetingRoomTo);
         MeetingRoom meetingRoom = convertToEntity(meetingRoomTo);
         return convertToDto(meetingRoomService.save(meetingRoom));
     }
 
     @DeleteMapping("/{id}")
     public void deleteById(@PathVariable Long id) {
+        log.info("Deleting meeting room with id: {}.", id);
         meetingRoomService.deleteById(id);
     }
 
     private MeetingRoomTO convertToDto(MeetingRoom meetingRoom) {
+        log.debug("Converting meeting room {} to DTO.", meetingRoom);
         MeetingRoomTO meetingRoomTO = modelMapper.map(meetingRoom, MeetingRoomTO.class);
         List<ReservationTO> reservations = meetingRoom.getReservations().stream()
                 .map(reservation -> modelMapper.map(reservation, ReservationTO.class))
@@ -93,6 +105,7 @@ public class MeetingRoomController {
     }
 
     private MeetingRoom convertToEntity(MeetingRoomTO meetingRoomTO) {
+        log.debug("Converting meeting room DTO {} to entity.", meetingRoomTO);
         Floor floor = floorService.getById(meetingRoomTO.getFloorId());
         MeetingRoom meetingRoom = modelMapper.map(meetingRoomTO, MeetingRoom.class);
         meetingRoom.setFloor(floor);

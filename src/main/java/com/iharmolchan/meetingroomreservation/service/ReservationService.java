@@ -1,9 +1,7 @@
 package com.iharmolchan.meetingroomreservation.service;
 
-import com.iharmolchan.meetingroomreservation.model.MeetingRoom;
 import com.iharmolchan.meetingroomreservation.model.Reservation;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ReservationService {

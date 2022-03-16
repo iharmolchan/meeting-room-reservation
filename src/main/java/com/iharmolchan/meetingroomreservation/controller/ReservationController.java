@@ -8,10 +8,9 @@ import com.iharmolchan.meetingroomreservation.service.MeetingRoomService;
 import com.iharmolchan.meetingroomreservation.service.ReservationService;
 import com.iharmolchan.meetingroomreservation.views.DefaultView;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,9 +21,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/reservation")
 @RequiredArgsConstructor
@@ -36,6 +35,7 @@ public class ReservationController {
     @JsonView(DefaultView.GET.class)
     @GetMapping
     public List<ReservationTO> getAll(@RequestParam(required = false) Long meetingRoomId) {
+        log.info("Returning all reservations.");
         List<Reservation> reservations = meetingRoomId == null ? reservationService.getAll() :
                 reservationService.getAllByRoomId(meetingRoomId);
         return reservations.stream().map(this::convertToDto).toList();
@@ -44,6 +44,7 @@ public class ReservationController {
     @JsonView(DefaultView.GET.class)
     @GetMapping("/{id}")
     public ReservationTO getById(@PathVariable Long id) {
+        log.info("Returning reservation with id: {}.", id);
         return convertToDto(reservationService.getById(id));
     }
 
@@ -53,6 +54,7 @@ public class ReservationController {
     public ReservationTO createReservation(
             @JsonView(DefaultView.CREATE.class) @RequestBody ReservationTO reservationTO
     ) {
+        log.info("Creating reservation: {}", reservationTO);
         Reservation reservation = convertToEntity(reservationTO);
         return convertToDto(reservationService.save(reservation));
     }
@@ -62,20 +64,24 @@ public class ReservationController {
     public ReservationTO updateReservation(
             @JsonView(DefaultView.UPDATE.class) @RequestBody ReservationTO reservationTO
     ) {
+        log.info("Updating reservation: {}.", reservationTO);
         Reservation reservation = convertToEntity(reservationTO);
         return convertToDto(reservationService.save(reservation));
     }
 
     @DeleteMapping("/{id}")
     public void deleteById(@PathVariable Long id) {
+        log.info("Deleting reservation with id: {}.", id);
         reservationService.deleteById(id);
     }
 
     private ReservationTO convertToDto(Reservation reservation) {
+        log.debug("Converting reservation {} to DTO.", reservation);
         return modelMapper.map(reservation, ReservationTO.class);
     }
 
     private Reservation convertToEntity(ReservationTO reservationTO) {
+        log.debug("Converting reservation DTO {} to entity.", reservationTO);
         Reservation reservation = modelMapper.map(reservationTO, Reservation.class);
         MeetingRoom meetingRoom = meetingRoomService.getById(reservationTO.getMeetingRoomId());
         reservation.setMeetingRoom(meetingRoom);
