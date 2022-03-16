@@ -55,12 +55,12 @@ public class BuildingController {
         buildingService.deleteById(id);
     }
 
-    private BuildingTO convertToDto(Building reservation) {
-        return modelMapper.map(reservation, BuildingTO.class);
+    private BuildingTO convertToDto(Building building) {
+        return modelMapper.map(building, BuildingTO.class);
     }
 
-    private Building convertToEntity(BuildingTO reservationTO) {
-        return modelMapper.map(reservationTO, Building.class);
+    private Building convertToEntity(BuildingTO buildingTO) {
+        return modelMapper.map(buildingTO, Building.class);
     }
 
 }

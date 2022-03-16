@@ -1,10 +1,14 @@
 package com.iharmolchan.meetingroomreservation.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.iharmolchan.meetingroomreservation.dto.FloorTO;
+import com.iharmolchan.meetingroomreservation.model.Building;
 import com.iharmolchan.meetingroomreservation.model.Floor;
+import com.iharmolchan.meetingroomreservation.service.BuildingService;
 import com.iharmolchan.meetingroomreservation.service.FloorService;
 import com.iharmolchan.meetingroomreservation.views.DefaultView;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,37 +17,52 @@ import java.util.List;
 @RestController
 @RequestMapping("/buildings/{buildingId}/floors")
 public class FloorController {
+    private final ModelMapper modelMapper;
     private final FloorService floorService;
+    private final BuildingService buildingService;
 
+    @JsonView(DefaultView.GET.class)
     @GetMapping
-    public List<Floor> getAllByBuilding(@PathVariable Long buildingId) {
-        return floorService.getAllByBuildingId(buildingId);
+    public List<FloorTO> getAllByBuilding(@PathVariable Long buildingId) {
+        return floorService.getAllByBuildingId(buildingId).stream().map(this::convertToDto).toList();
     }
 
+    @JsonView(DefaultView.GET.class)
     @GetMapping("/{id}")
-    public Floor getById(@PathVariable Long id) {
-        return floorService.getById(id);
+    public FloorTO getById(@PathVariable Long id) {
+        return convertToDto(floorService.getById(id));
     }
 
 
     @PostMapping
-    public Floor createFloor(
+    public FloorTO createFloor(
             @PathVariable Long buildingId,
-            @JsonView(DefaultView.CREATE.class) @RequestBody Floor floor
+            @JsonView(DefaultView.CREATE.class) @RequestBody FloorTO floorTo
     ) {
-        return floorService.save(floor, buildingId);
+        Floor floor = convertToEntity(floorTo);
+        return convertToDto(floorService.save(floor, buildingId));
     }
 
     @PutMapping
-    public Floor updateFloor(
+    public FloorTO updateFloor(
             @PathVariable Long buildingId,
-            @JsonView(DefaultView.UPDATE.class) @RequestBody Floor floor
+            @JsonView(DefaultView.UPDATE.class) @RequestBody FloorTO floorTo
     ) {
-        return floorService.save(floor, buildingId);
+        Floor floor = convertToEntity(floorTo);
+        return convertToDto(floorService.save(floor, buildingId));
     }
 
     @DeleteMapping("/{id}")
     public void deleteById(@PathVariable Long id) {
         floorService.deleteById(id);
     }
+
+    private FloorTO convertToDto(Floor floor) {
+        return modelMapper.map(floor, FloorTO.class);
+    }
+
+    private Floor convertToEntity(FloorTO floorTO) {
+        return modelMapper.map(floorTO, Floor.class);
+    }
+
 }

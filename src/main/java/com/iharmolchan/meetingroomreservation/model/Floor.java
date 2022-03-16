@@ -24,7 +24,6 @@ import javax.persistence.UniqueConstraint;
 @Setter
 @ToString
 public class Floor extends BaseEntity {
-    @JsonView({DefaultView.CREATE.class, DefaultView.UPDATE.class})
     private Integer number;
 
     @ManyToOne
